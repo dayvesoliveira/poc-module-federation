@@ -23,9 +23,11 @@ Pode concluir que é uma grande aposta para o futuro.
 
 ## Packages
 
-- foi criado uma pasta chamada packages, para simplificar o build do projeto, pois para fazer o build paralelo dos Apps, utilizei:
-* concurrently
-* wsrun
+Foi criado uma pasta chamada packages, para simplificar o build do projeto, pois para fazer o build paralelo dos Apps o wsrun precisa que tenha
+pasta e que os projetos estejam dentro dela.
+
+* concurrently (https://www.npmjs.com/package/concurrently)
+* wsrun (https://www.npmjs.com/package/wsrun)
 
 Obs: lembre-se que para utilizar esse tipo de deploy, deve ser instalado o yarn como dependência.
 
