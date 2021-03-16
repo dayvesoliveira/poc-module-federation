@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"wsrun --parallel start\"",
-    "install": "concurrently \"wsrun --parallel install\""
+    "microfe:install": "concurrently \"wsrun --parallel install\""
   },
   "scripts-test": {
     "install-all": "concurrently \"cd packages/pneus && npm i\" \"cd packages/acessorios && npm i\" \"cd packages/autocenter && npm i\" -n pneus,acessorios,autocenter",
@@ -20,7 +20,7 @@
   ],
   "devDependencies": {
     "concurrently": "^5.3.0",
-    "webpack-dev-server": "^3.11.0",
+    "webpack-dev-server": "^3.11.1",
     "wsrun": "^5.2.0",
     "prettier": "^2.0.2"
   },
