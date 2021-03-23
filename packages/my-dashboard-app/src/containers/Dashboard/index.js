@@ -3,6 +3,7 @@ import { Box, Grid } from '@material-ui/core';
 import Layout from '../../components/Layout';
 import ContainerShell from 'shell/ContainerShell';
 import Authenticated from 'auth/Authenticated';
+import CardDashboard from 'data/CardDashboard';
 
 const Dashboard = () => (
   <ContainerShell>
@@ -14,6 +15,9 @@ const Dashboard = () => (
             </Grid>
             <Grid item xs={12}>
               <Authenticated />
+            </Grid>
+            <Grid item xs={12}>
+              <CardDashboard />
             </Grid>
           </Grid>
       </Box>

@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = webpack.container;
+
 const dependencies = require("./package.json").dependencies;
 
 const envPaths = {
@@ -10,24 +11,26 @@ const envPaths = {
   development: path.resolve(__dirname + '/', `.env.development`),
 };
 
-module.exports = (_, args) => {
-
-  const envPath = envPaths[args.mode] || envPaths.development;
-
-
-  dotenv.config({ path: envPath });
-
+const createDotEnvPlugin = (envPath) => {
   const fileEnv = dotenv.config({ path: envPath }).parsed;
-
   // reduce it to a nice object, the same as before (but with the variables from the file)
-  const envKeys = Object.keys(fileEnv).reduce((prev, next) => {
+  const envKeys =  Object.keys(fileEnv).reduce((prev, next) => {
       prev[`process.env.${next}`] = JSON.stringify(fileEnv[next]);
       return prev;
   }, {});
 
+  return new webpack.DefinePlugin(envKeys);
+};
+
+module.exports = (_, args) => {
+
+  const envPath = envPaths[args.mode] || envPaths.development;
+  const port = 3003;
+
+  dotenv.config({ path: envPath });
+
   return {
 
-    // mode: "development",
     mode: args.mode,
 
     optimization: {
@@ -42,17 +45,15 @@ module.exports = (_, args) => {
       main: ['@babel/polyfill', path.resolve('.', 'src', 'index.js')]
     },
 
-    // mode: "development",
-
     devServer: {
       contentBase: path.join(__dirname, "public"),
       host: '0.0.0.0',
-      port: 3000,
+      port: port,
       historyApiFallback: true
     },
 
     output: {
-      publicPath: "http://localhost:3000/",
+      publicPath: `http://localhost:${port}/`,
       chunkFilename: "[id].[contenthash].js"
     },
 
@@ -81,9 +82,9 @@ module.exports = (_, args) => {
             'sass-loader',
           ],
         },
-       {
-        test: /\.(jpg|png|gif|svg|pdf|ico)$/,
-        use: [
+        {
+          test: /\.(jpg|png|gif|svg|pdf|ico)$/,
+          use: [
             {
                 loader: 'file-loader',
                 options: {
@@ -108,24 +109,19 @@ module.exports = (_, args) => {
     },
 
     plugins: [
+
       new ModuleFederationPlugin({
 
-        // O nome desse módulo para a federação será "dashboard"
-        name: 'dashboard',
+        // O nome desse módulo para a federação
+        name: 'data',
 
         // O arquivo que precisa ser carregado pelas outras aplicações é o remoteEntry.js
-        // filename: "remoteEntry.js",
         filename: process.env.FILENAME,
 
-        remotes: {
-          // auth: 'auth@$@http://localhost:3002/remoteEntry.js',
-          auth: process.env.AUTH_MODULE,
-          shell: process.env.SHELL_MODULE,
-          data: process.env.DATA_MODULE,
-        },
+        remotes: {},
 
         exposes: {
-          "./App": "./src/App",
+          './CardDashboard': './src/containers/CardDashboard',
         },
 
         shared: {
@@ -142,10 +138,6 @@ module.exports = (_, args) => {
               requiredVersion: dependencies['react'],
               singleton: true,
           },
-          axios: {
-            requiredVersion: dependencies['axios'],
-            singleton: true,
-          },
           '@material-ui/styles': {
             singleton: true,
           },
@@ -153,11 +145,11 @@ module.exports = (_, args) => {
       }),
 
       new HtmlWebpackPlugin({
-        title: 'My Dashboard',
+        title: 'Dashboard - Data',
         template: './public/index.ejs'
       }),
 
-      new webpack.DefinePlugin(envKeys)
+      createDotEnvPlugin(envPath),
     ],
   };
 
